@@ -223,8 +223,6 @@ func (c *Cluster) NewNodes(ctx context.Context, n int) (clusteriface.Nodes, erro
 
 	userData := base64.StdEncoding.EncodeToString(buf.Bytes())
 
-	fmt.Println("user data:", userData)
-
 	n64 := int64(n)
 	input := &ec2.RunInstancesInput{
 		ImageId:                           &c.config.amiID,

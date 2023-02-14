@@ -69,7 +69,6 @@ func (a *logAdapter) Printf(msg string, args ...interface{}) { a.Debugf(msg, arg
 func NewClient(log *zap.SugaredLogger, certs *Certs, ipAddr string, port int, opts ...ClientOption) (*Client, error) {
 	dialer := &net.Dialer{Timeout: 5 * time.Second}
 	httpDialAddrPort := fmt.Sprintf("%s:%d", ipAddr, port)
-	fmt.Println("new client at", httpDialAddrPort)
 
 	// Don't do DNS lookup for dialing.
 	// This prevents the default dialer from modifying the host header, which we need since we are not using public CAs.
