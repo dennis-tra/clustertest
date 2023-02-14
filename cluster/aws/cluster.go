@@ -263,7 +263,7 @@ func (c *Cluster) NewNodes(ctx context.Context, n int) (clusteriface.Nodes, erro
 	var ifaceNodes clusteriface.Nodes
 	var nodes []*Node
 	for _, inst := range instances {
-		nodeAgentClient, err := agent.NewClient(c.config.log, c.config.cert, *inst.PublicIpAddress, 8080)
+		nodeAgentClient, err := agent.NewClient(c.config.log, c.config.cert, *inst.PrivateIpAddress, 8080)
 		if err != nil {
 			return nil, fmt.Errorf("constructing node agent client: %w", err)
 		}
