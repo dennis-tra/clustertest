@@ -255,7 +255,7 @@ func (c *Cluster) NewNodes(ctx context.Context, n int) (clusteriface.Nodes, erro
 
 	instances, err := c.waitForInstances(ctx, reservations.Instances)
 	if err != nil {
-		return nil, fmt.Errorf("waiting for instancs: %w", err)
+		return nil, fmt.Errorf("waiting for instances: %w", err)
 	}
 
 	var ifaceNodes clusteriface.Nodes
@@ -288,7 +288,7 @@ func (c *Cluster) NewNodes(ctx context.Context, n int) (clusteriface.Nodes, erro
 }
 
 func (c *Cluster) waitForNodeHeartbeat(ctx context.Context, node *Node) {
-	ticker := time.NewTicker(100 * time.Millisecond)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	for {
 		select {
@@ -304,7 +304,7 @@ func (c *Cluster) waitForNodeHeartbeat(ctx context.Context, node *Node) {
 }
 
 func (c *Cluster) waitForNodesHeartbeats(ctx context.Context, nodes []*Node) error {
-	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 	wg := sync.WaitGroup{}
 	wg.Add(len(nodes))
