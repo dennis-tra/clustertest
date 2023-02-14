@@ -61,14 +61,22 @@ func (c *Cluster) ensureLoaded() error {
 		c.config.session = sess
 	}
 
-	outputsMap, err := fetchStackOutputs(c.config.session)
-	if err != nil {
-		return fmt.Errorf("fetching stack outputs: %w", err)
-	}
+	if c.config.accountID == "" { // TODO: improve :/
+		outputsMap, err := fetchStackOutputs(c.config.session)
+		if err != nil {
+			return fmt.Errorf("fetching stack outputs: %w", err)
+		}
 
-	outputs, err := parseStackOutputs(outputsMap)
-	if err != nil {
-		return fmt.Errorf("parsing stack outputs: %w", err)
+		outputs, err := parseStackOutputs(outputsMap)
+		if err != nil {
+			return fmt.Errorf("parsing stack outputs: %w", err)
+		}
+
+		c.config.accountID = outputs.accountID
+		c.config.instanceProfileARN = outputs.ec2InstanceProfileARN
+		c.config.instanceSecurityGroupID = outputs.ec2SecurityGroupID
+		c.config.subnetID = outputs.publicSubnetIDs[0]
+		c.config.nodeAgentS3Bucket = outputs.s3Bucket
 	}
 
 	if c.config.amiID == "" {
@@ -99,16 +107,10 @@ func (c *Cluster) ensureLoaded() error {
 	c.config.ec2Client = ec2.New(c.config.session)
 
 	// upload the node agent to S3
-	nodeAgentKey, err := provideFileViaS3(c.config.s3Client, outputs.s3Bucket, c.config.nodeAgentBin)
+	nodeAgentKey, err := provideFileViaS3(c.config.s3Client, c.config.nodeAgentS3Bucket, c.config.nodeAgentBin)
 	if err != nil {
 		return fmt.Errorf("uploading node agent to S3: %w", err)
 	}
-
-	c.config.accountID = outputs.accountID
-	c.config.instanceProfileARN = outputs.ec2InstanceProfileARN
-	c.config.instanceSecurityGroupID = outputs.ec2SecurityGroupID
-	c.config.subnetID = outputs.publicSubnetIDs[0]
-	c.config.nodeAgentS3Bucket = outputs.s3Bucket
 	c.config.nodeAgentS3Key = nodeAgentKey
 
 	c.config.loaded = true

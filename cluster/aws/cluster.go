@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -78,6 +79,27 @@ func (c *Cluster) WithLogger(l *zap.SugaredLogger) *Cluster {
 
 func (c *Cluster) WithInstanceType(s string) *Cluster {
 	c.InstanceType = s
+	return c
+}
+
+func (c *Cluster) WithPublicSubnetID(subnetID string) *Cluster {
+	c.config.subnetID = subnetID
+	return c
+}
+
+func (c *Cluster) WithInstanceProfileARN(a arn.ARN) *Cluster {
+	c.config.instanceProfileARN = a.String()
+	c.config.accountID = a.AccountID
+	return c
+}
+
+func (c *Cluster) WithInstanceSecurityGroupID(id string) *Cluster {
+	c.config.instanceSecurityGroupID = id
+	return c
+}
+
+func (c *Cluster) WithS3BucketARN(a arn.ARN) *Cluster {
+	c.config.nodeAgentS3Bucket = a.Resource
 	return c
 }
 
