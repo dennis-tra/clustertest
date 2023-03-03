@@ -77,6 +77,11 @@ func (c *Cluster) WithLogger(l *zap.SugaredLogger) *Cluster {
 	return c
 }
 
+func (c *Cluster) WithKeyName(s string) *Cluster {
+	c.config.KeyName = s
+	return c
+}
+
 func (c *Cluster) WithInstanceType(s string) *Cluster {
 	c.InstanceType = s
 	return c
@@ -224,12 +229,17 @@ func (c *Cluster) NewNodes(ctx context.Context, n int) (clusteriface.Nodes, erro
 	userData := base64.StdEncoding.EncodeToString(buf.Bytes())
 
 	n64 := int64(n)
+	var keyName *string
+	if c.config.KeyName != "" {
+		keyName = &c.config.KeyName
+	}
 	input := &ec2.RunInstancesInput{
 		ImageId:                           &c.config.amiID,
 		IamInstanceProfile:                &ec2.IamInstanceProfileSpecification{Arn: &c.config.instanceProfileARN},
 		InstanceType:                      &c.InstanceType,
 		MaxCount:                          &n64,
 		MinCount:                          &n64,
+		KeyName:                           keyName,
 		InstanceInitiatedShutdownBehavior: aws.String(ec2.ShutdownBehaviorTerminate),
 		UserData:                          &userData,
 		NetworkInterfaces: []*ec2.InstanceNetworkInterfaceSpecification{{

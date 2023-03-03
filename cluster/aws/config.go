@@ -36,6 +36,7 @@ type config struct {
 	subnetID                string
 	nodeAgentS3Bucket       string
 	nodeAgentS3Key          string
+	KeyName                 string
 }
 
 func (c *Cluster) ensureLoaded() error {
